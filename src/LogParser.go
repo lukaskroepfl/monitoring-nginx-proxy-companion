@@ -3,6 +3,7 @@ package main
 import (
   "regexp"
   "strconv"
+  "errors"
 )
 
 type ParsedLogLine struct {
@@ -22,7 +23,7 @@ type ParsedLogLine struct {
 const LOG_LINE_REGEX = `^(\S+) *\|\s+(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
 const PROXY_CONTAINER_NAME_DEFAULT = "nginx"
 
-func ParseProxyLogLine(line string) ParsedLogLine {
+func ParseProxyLogLine(line string) (ParsedLogLine, error) {
   var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
 
   logLineParserRegexResult := logLineParserRegex.FindStringSubmatch(line)
@@ -30,7 +31,7 @@ func ParseProxyLogLine(line string) ParsedLogLine {
   containerName := logLineParserRegexResult[1]
 
   if !isProxyContainer(containerName) {
-    return ParsedLogLine{containerName: containerName}
+    return ParsedLogLine{}, errors.New("Container name does not match proxy container name.")
   }
 
   host := logLineParserRegexResult[2]
@@ -62,7 +63,7 @@ func ParseProxyLogLine(line string) ParsedLogLine {
   parsedLogLine.httpReferer = httpReferer
   parsedLogLine.userAgent = userAgent
 
-  return parsedLogLine
+  return parsedLogLine, nil
 }
 
 func isProxyContainer(containerName string) bool {
