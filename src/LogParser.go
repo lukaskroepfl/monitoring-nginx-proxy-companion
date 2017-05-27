@@ -19,16 +19,25 @@ type ParsedLogLine struct {
   userAgent     string
 }
 
-func ParseLogLine(line string) ParsedLogLine {
-  var logLineParserRegex = regexp.MustCompile(`^(\S+) *\|\s+(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`)
+const LOG_LINE_REGEX = `^(\S+) *\|\s+(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
+const PROXY_CONTAINER_NAME_DEFAULT = "nginx"
+
+func ParseProxyLogLine(line string) ParsedLogLine {
+  var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
 
   logLineParserRegexResult := logLineParserRegex.FindStringSubmatch(line)
 
   containerName := logLineParserRegexResult[1]
+
+  if !isProxyContainer(containerName) {
+    return ParsedLogLine{containerName: containerName}
+  }
+
   host := logLineParserRegexResult[2]
   remoteAddress := logLineParserRegexResult[3]
   timestamp := logLineParserRegexResult[4]
   httpRequest := logLineParserRegexResult[5]
+
   var httpRequestRegex = regexp.MustCompile(`^(\S+)\s+(\S+)\s+(\S+)`)
   httpRequestRegexResult := httpRequestRegex.FindStringSubmatch(httpRequest)
   requestType := httpRequestRegexResult[1]
@@ -54,4 +63,8 @@ func ParseLogLine(line string) ParsedLogLine {
   parsedLogLine.userAgent = userAgent
 
   return parsedLogLine
+}
+
+func isProxyContainer(containerName string) bool {
+  return containerName == PROXY_CONTAINER_NAME_DEFAULT
 }
