@@ -1,6 +1,12 @@
 package main
 
-import "fmt"
+import (
+  "fmt"
+  "os"
+)
+
+const PROXY_CONTAINER_NAME_ENV_NAME = "PROXY_CONTAINER_NAME"
+const PROXY_CONTAINER_NAME_DEFAULT = "nginx"
 
 func logCallback(logLine string) {
   parsedLogline, err := ParseProxyLogLine(logLine)
@@ -11,6 +17,17 @@ func logCallback(logLine string) {
   fmt.Println(parsedLogline)
 }
 
+func getProxyContainerName() string {
+  envProxyContainerName := os.Getenv(PROXY_CONTAINER_NAME_ENV_NAME)
+  if envProxyContainerName == "" {
+    return PROXY_CONTAINER_NAME_DEFAULT
+  }
+
+  return envProxyContainerName
+}
+
 func main() {
-  AttachContainerLogListener("9a7f981eed04", logCallback)
+  proxyContainerId := FindProxyContainerId()
+
+  AttachContainerLogListener(proxyContainerId, logCallback)
 }
