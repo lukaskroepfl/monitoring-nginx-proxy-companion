@@ -10,7 +10,7 @@ import (
 
 const DOCKER_DAEMON_SOCKET = "unix:///var/run/docker.sock"
 
-func listenToPipes(stdout, stderr io.Reader, logCallback func(logLine string))  {
+func listenToPipes(stdout, stderr io.Reader, logCallback func(logLine string)) {
   listenToPipe := func(input io.Reader) {
     buf := bufio.NewReader(input)
 
