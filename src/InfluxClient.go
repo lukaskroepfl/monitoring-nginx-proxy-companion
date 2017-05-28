@@ -9,7 +9,7 @@ import (
 
 func WriteToInflux(parsedLogLine ParsedLogLine) {
   dbClient, err := client.NewHTTPClient(client.HTTPConfig{
-    Addr: INFLUX_URL,
+    Addr: getInfluxUrl(),
   })
 
   batchPoints, err := client.NewBatchPoints(client.BatchPointsConfig{
