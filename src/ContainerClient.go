@@ -55,3 +55,29 @@ func AttachContainerLogListener(containerId string, logCallback func(logLine str
     }
   }
 }
+
+func FindProxyContainerId() string {
+  client, err := docker.NewClient(DOCKER_DAEMON_SOCKET)
+  if err != nil {
+    panic(err)
+  }
+
+  proxyContainerName := getProxyContainerName()
+
+  filters := make(map[string][]string)
+  filters["name"] = append(filters["name"], proxyContainerName)
+
+  containers, err := client.ListContainers(docker.ListContainersOptions{Filters: filters})
+  if err != nil {
+    panic(err)
+  }
+
+  if len(containers) <= 0 {
+    panic("No running container found with specified name.")
+  }
+
+  proxyContainer := containers[0]
+  proxyContainerId := proxyContainer.ID
+
+  return proxyContainerId
+}
