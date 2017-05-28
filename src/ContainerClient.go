@@ -5,6 +5,7 @@ import (
   "time"
   "io"
   "bufio"
+  "log"
 )
 
 const DOCKER_DAEMON_SOCKET = "unix:///var/run/docker.sock"
@@ -18,11 +19,16 @@ func listenToPipes(stdout, stderr io.Reader, logCallback func(logLine string))  
       logCallback(line)
     }
   }
+
+  log.Println("Listening to stdout and stderr pipes")
+
   go listenToPipe(stdout)
   go listenToPipe(stderr)
 }
 
 func AttachContainerLogListener(containerId string, logCallback func(logLine string)) {
+  log.Println("Attaching container log listener.")
+
   client, err := docker.NewClient(DOCKER_DAEMON_SOCKET)
   if err != nil {
     panic(err)
@@ -35,6 +41,7 @@ func AttachContainerLogListener(containerId string, logCallback func(logLine str
 
   listenToPipes(stdoutReader, stderrReader, logCallback)
 
+  log.Println("Starting to get logs from docker daemon.")
   for {
     dockerLogErr := client.Logs(docker.LogsOptions{
       Container:         containerId,
@@ -57,6 +64,8 @@ func AttachContainerLogListener(containerId string, logCallback func(logLine str
 }
 
 func FindProxyContainerId() string {
+  log.Println("Finding proxy container.")
+
   client, err := docker.NewClient(DOCKER_DAEMON_SOCKET)
   if err != nil {
     panic(err)
@@ -67,6 +76,7 @@ func FindProxyContainerId() string {
   filters := make(map[string][]string)
   filters["name"] = append(filters["name"], proxyContainerName)
 
+  log.Println("Getting proxy container with name: ", proxyContainerName)
   containers, err := client.ListContainers(docker.ListContainersOptions{Filters: filters})
   if err != nil {
     panic(err)
