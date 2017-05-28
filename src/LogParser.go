@@ -21,7 +21,6 @@ type ParsedLogLine struct {
 }
 
 const LOG_LINE_REGEX = `^(\S+) *\|\s+(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
-const PROXY_CONTAINER_NAME_DEFAULT = "nginx"
 
 func ParseProxyLogLine(line string) (ParsedLogLine, error) {
   var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
@@ -67,5 +66,5 @@ func ParseProxyLogLine(line string) (ParsedLogLine, error) {
 }
 
 func isProxyContainer(containerName string) bool {
-  return containerName == PROXY_CONTAINER_NAME_DEFAULT
+  return containerName == getProxyContainerName()
 }
