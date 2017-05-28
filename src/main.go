@@ -1,13 +1,12 @@
 package main
 
-import (
-  "os"
-)
+import "log"
 
 const PROXY_CONTAINER_NAME_ENV_NAME = "PROXY_CONTAINER_NAME"
 const PROXY_CONTAINER_NAME_DEFAULT = "nginx"
 
-const INFLUX_URL = "http://localhost:8086"
+const INFLUX_URL_ENV_NAME = "INFLUX_URL"
+const INFLUX_URL_DEFAULT = "http://localhost:8086"
 
 func logCallback(logLine string) {
   parsedLogline, err := ParseProxyLogLine(logLine)
@@ -19,16 +18,19 @@ func logCallback(logLine string) {
 }
 
 func getProxyContainerName() string {
-  envProxyContainerName := os.Getenv(PROXY_CONTAINER_NAME_ENV_NAME)
-  if envProxyContainerName == "" {
-    return PROXY_CONTAINER_NAME_DEFAULT
-  }
+  return GetEnvOrDefault(PROXY_CONTAINER_NAME_ENV_NAME, PROXY_CONTAINER_NAME_DEFAULT)
+}
 
-  return envProxyContainerName
+func getInfluxUrl() string {
+  return GetEnvOrDefault(INFLUX_URL_ENV_NAME, INFLUX_URL_DEFAULT)
 }
 
 func main() {
+  log.Println("Starting monitoring-nginx-proxy-companion")
+
   proxyContainerId := FindProxyContainerId()
+
+  log.Println("Found proxy container with id: ", proxyContainerId)
 
   AttachContainerLogListener(proxyContainerId, logCallback)
 }
