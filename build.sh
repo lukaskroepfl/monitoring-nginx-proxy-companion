@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-go build --ldflags '-extldflags "-static"' -o ./build/main ./src
+CGO=0 GOARCH=amd64 GOOS=Linux go build -o ./build/main ./src
