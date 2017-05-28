@@ -9,20 +9,20 @@ import (
 
 const DOCKER_DAEMON_SOCKET = "unix:///var/run/docker.sock"
 
-func listenToPipes(stdout, stderr io.Reader)  {
+func listenToPipes(stdout, stderr io.Reader, logCallback func(logLine string))  {
   listenToPipe := func(input io.Reader) {
     buf := bufio.NewReader(input)
 
     for {
       line, _ := buf.ReadString('\n')
-      println(line)
+      logCallback(line)
     }
   }
   go listenToPipe(stdout)
   go listenToPipe(stderr)
 }
 
-func getLogsOfContainer(containerId string) {
+func AttachContainerLogListener(containerId string, logCallback func(logLine string)) {
   client, err := docker.NewClient(DOCKER_DAEMON_SOCKET)
   if err != nil {
     panic(err)
@@ -33,7 +33,7 @@ func getLogsOfContainer(containerId string) {
   stdoutReader, stdoutWriter := io.Pipe()
   stderrReader, stderrWriter := io.Pipe()
 
-  listenToPipes(stdoutReader, stderrReader)
+  listenToPipes(stdoutReader, stderrReader, logCallback)
 
   for {
     dockerLogErr := client.Logs(docker.LogsOptions{
