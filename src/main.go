@@ -1,12 +1,13 @@
 package main
 
 import (
-  "fmt"
   "os"
 )
 
 const PROXY_CONTAINER_NAME_ENV_NAME = "PROXY_CONTAINER_NAME"
 const PROXY_CONTAINER_NAME_DEFAULT = "nginx"
+
+const INFLUX_URL = "http://localhost:8086"
 
 func logCallback(logLine string) {
   parsedLogline, err := ParseProxyLogLine(logLine)
@@ -14,7 +15,7 @@ func logCallback(logLine string) {
     panic(err)
   }
 
-  fmt.Println(parsedLogline)
+  WriteToInflux(parsedLogline)
 }
 
 func getProxyContainerName() string {
