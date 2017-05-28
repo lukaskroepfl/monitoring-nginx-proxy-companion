@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-go build -o ./build/main ./src
+go build --ldflags '-extldflags "-static"' -o ./build/main ./src
