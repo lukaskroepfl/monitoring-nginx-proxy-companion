@@ -12,6 +12,10 @@ func WriteToInflux(parsedLogLine ParsedLogLine) {
     Addr: getInfluxUrl(),
   })
 
+  if err != nil {
+    log.Fatal(err)
+  }
+
   batchPoints, err := client.NewBatchPoints(client.BatchPointsConfig{
     Database:  "monitoring",
   })
@@ -43,6 +47,7 @@ func WriteToInflux(parsedLogLine ParsedLogLine) {
   batchPoints.AddPoint(point)
 
   if err := dbClient.Write(batchPoints); err != nil {
-    log.Fatal(err)
+    log.Println("Could not insert into influx .")
+    return
   }
 }
