@@ -1,21 +1,11 @@
 package main
 
-import "log"
+import (
+  "log"
+)
 
 const PROXY_CONTAINER_NAME_ENV_NAME = "PROXY_CONTAINER_NAME"
 const PROXY_CONTAINER_NAME_DEFAULT = "nginx"
-
-const INFLUX_URL_ENV_NAME = "INFLUX_URL"
-const INFLUX_URL_DEFAULT = "http://localhost:8086"
-
-func logCallback(logLine string) {
-  parsedLogline, err := ParseProxyLogLine(logLine)
-  if err != nil {
-    panic(err)
-  }
-
-  WriteToInflux(parsedLogline)
-}
 
 func getProxyContainerName() string {
   return GetEnvOrDefault(PROXY_CONTAINER_NAME_ENV_NAME, PROXY_CONTAINER_NAME_DEFAULT)
@@ -28,9 +18,16 @@ func getInfluxUrl() string {
 func main() {
   log.Println("Starting monitoring-nginx-proxy-companion")
 
-  proxyContainerId := FindProxyContainerId()
+  log.Println("Setting up influx client.")
+  influxdbLogPersistor := InfluxdbLogPersistor{}
+  influxdbLogPersistor.Setup()
 
-  log.Println("Found proxy container with id: ", proxyContainerId)
+  log.Println("Creating docker container log miner.")
+  dockerContainerLogMiner := DockerContainerLogMiner{}
+  dockerContainerLogMiner.SetLogPersistor(influxdbLogPersistor)
+  logParser := StandardLogParser{}
+  dockerContainerLogMiner.SetLogParser(logParser)
 
-  AttachContainerLogListener(proxyContainerId, logCallback)
+  log.Println("Start log mining.")
+  dockerContainerLogMiner.Mine()
 }
