@@ -7,9 +7,6 @@ import (
   "time"
 )
 
-const INFLUX_URL_ENV_NAME = "INFLUX_URL"
-const INFLUX_URL_DEFAULT = "http://localhost:8086"
-
 type InfluxdbLogPersistor struct {
   influxClient client.Client
 }
@@ -61,4 +58,8 @@ func (influxLogPersistor InfluxdbLogPersistor) Persist(parsedLogLine ParsedLogLi
     log.Println("Could not insert into influx .")
     return
   }
+}
+
+func getInfluxUrl() string {
+  return GetEnvOrPanic(INFLUX_URL_ENV_NAME)
 }

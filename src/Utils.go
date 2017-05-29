@@ -1,11 +1,14 @@
 package main
 
-import "os"
+import (
+  "os"
+  "fmt"
+)
 
-func GetEnvOrDefault(envName string, envDefault string) string {
+func GetEnvOrPanic(envName string) string {
   envValue := os.Getenv(envName)
   if envValue == "" {
-    return envDefault
+    panic(fmt.Sprintf("Env %s not set", envName));
   }
 
   return envValue

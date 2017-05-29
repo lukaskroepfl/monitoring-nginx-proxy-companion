@@ -115,3 +115,7 @@ func findProxyContainerId() string {
 
   return proxyContainerId
 }
+
+func getProxyContainerName() string {
+  return GetEnvOrPanic(PROXY_CONTAINER_NAME_ENV_NAME)
+}

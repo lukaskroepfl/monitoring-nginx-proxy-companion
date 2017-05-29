@@ -5,15 +5,7 @@ import (
 )
 
 const PROXY_CONTAINER_NAME_ENV_NAME = "PROXY_CONTAINER_NAME"
-const PROXY_CONTAINER_NAME_DEFAULT = "nginx"
-
-func getProxyContainerName() string {
-  return GetEnvOrDefault(PROXY_CONTAINER_NAME_ENV_NAME, PROXY_CONTAINER_NAME_DEFAULT)
-}
-
-func getInfluxUrl() string {
-  return GetEnvOrDefault(INFLUX_URL_ENV_NAME, INFLUX_URL_DEFAULT)
-}
+const INFLUX_URL_ENV_NAME = "INFLUX_URL"
 
 func main() {
   log.Println("Starting monitoring-nginx-proxy-companion")
