@@ -52,6 +52,7 @@ func (standardLogParser StandardLogParser) Parse(logLine string) (ParsedLogLine,
   parsedLogLine.userAgent = userAgent
 
   parseUserAgentAndSetFields(userAgent, &parsedLogLine)
+  lookupIpAndSetFields(remoteAddress, &parsedLogLine)
 
   return parsedLogLine, nil
 }
@@ -64,6 +65,15 @@ func parseUserAgentAndSetFields(userAgentString string, parsedLogLine *ParsedLog
   parsedLogLine.browserVersion = userAgent.browserVersion
   parsedLogLine.os = userAgent.os
   parsedLogLine.mobile = userAgent.mobile
+}
+
+func lookupIpAndSetFields(ip string, parsedLogLine *ParsedLogLine) {
+  geoIp2IPLookupService := GeoIp2IPLookupService{}
+
+  ipLocation := geoIp2IPLookupService.Lookup(ip)
+
+  parsedLogLine.country = ipLocation.country
+  parsedLogLine.city = ipLocation.city
 }
 
 func isProxyContainer(containerName string) bool {
