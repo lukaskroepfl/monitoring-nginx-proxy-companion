@@ -1,5 +1,5 @@
 package main
 
 type ILogPersistor interface {
-  Persist()
+  Persist(parsedLogLine ParsedLogLine)
 }
