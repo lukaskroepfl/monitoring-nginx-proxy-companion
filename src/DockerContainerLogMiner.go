@@ -1,22 +1,43 @@
 package main
 
 import (
-  "github.com/fsouza/go-dockerclient"
-  "time"
-  "io"
-  "bufio"
   "log"
+  "github.com/fsouza/go-dockerclient"
+  "io"
+  "time"
+  "bufio"
 )
 
 const DOCKER_DAEMON_SOCKET = "unix:///var/run/docker.sock"
 
-func listenToPipes(stdout, stderr io.Reader, logCallback func(logLine string)) {
+type DockerContainerLogMiner struct {
+  logPersistor *ILogPersistor
+  logParser *ILogParser
+}
+
+func (dockerContainerLogMiner *DockerContainerLogMiner) SetLogPersistor(logPersistor ILogPersistor) {
+  dockerContainerLogMiner.logPersistor = &logPersistor
+}
+
+func (dockerContainerLogMiner *DockerContainerLogMiner) SetLogParser(logParser ILogParser) {
+  dockerContainerLogMiner.logParser = &logParser
+}
+
+func (dockerContainerLogMiner *DockerContainerLogMiner) ParseAndPersistStdPipesOutput(stdout, stderr io.Reader) {
   listenToPipe := func(input io.Reader) {
     buf := bufio.NewReader(input)
 
     for {
       line, _ := buf.ReadString('\n')
-      logCallback(line)
+
+
+      parsedLogLine, err := (*dockerContainerLogMiner.logParser).Parse(line)
+
+      if err != nil {
+        continue
+      }
+
+      (*dockerContainerLogMiner.logPersistor).Persist(parsedLogLine)
     }
   }
 
@@ -26,7 +47,10 @@ func listenToPipes(stdout, stderr io.Reader, logCallback func(logLine string)) {
   go listenToPipe(stderr)
 }
 
-func AttachContainerLogListener(containerId string, logCallback func(logLine string)) {
+
+func (dockerContainerLogMiner *DockerContainerLogMiner) Mine() {
+  containerId := findProxyContainerId()
+
   log.Println("Attaching container log listener.")
 
   client, err := docker.NewClient(DOCKER_DAEMON_SOCKET)
@@ -39,7 +63,7 @@ func AttachContainerLogListener(containerId string, logCallback func(logLine str
   stdoutReader, stdoutWriter := io.Pipe()
   stderrReader, stderrWriter := io.Pipe()
 
-  listenToPipes(stdoutReader, stderrReader, logCallback)
+  dockerContainerLogMiner.ParseAndPersistStdPipesOutput(stdoutReader, stderrReader)
 
   log.Println("Starting to get logs from docker daemon.")
   for {
@@ -63,7 +87,7 @@ func AttachContainerLogListener(containerId string, logCallback func(logLine str
   }
 }
 
-func FindProxyContainerId() string {
+func findProxyContainerId() string {
   log.Println("Finding proxy container.")
 
   client, err := docker.NewClient(DOCKER_DAEMON_SOCKET)
