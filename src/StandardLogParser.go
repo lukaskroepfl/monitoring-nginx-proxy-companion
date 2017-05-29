@@ -51,7 +51,19 @@ func (standardLogParser StandardLogParser) Parse(logLine string) (ParsedLogLine,
   parsedLogLine.httpReferer = httpReferer
   parsedLogLine.userAgent = userAgent
 
+  parseUserAgentAndSetFields(userAgent, &parsedLogLine)
+
   return parsedLogLine, nil
+}
+
+func parseUserAgentAndSetFields(userAgentString string, parsedLogLine *ParsedLogLine) {
+  mssolaUserAgentParser := MssolaUserAgentParser{}
+  userAgent := mssolaUserAgentParser.Parse(userAgentString)
+
+  parsedLogLine.browser = userAgent.browser
+  parsedLogLine.browserVersion = userAgent.browserVersion
+  parsedLogLine.os = userAgent.os
+  parsedLogLine.mobile = userAgent.mobile
 }
 
 func isProxyContainer(containerName string) bool {
