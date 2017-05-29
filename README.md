@@ -1,1 +1,3 @@
 # monitoring-nginx-proxy-companion [![Build Status](https://travis-ci.org/lukaskroepfl/monitoring-nginx-proxy-companion.svg?branch=master)](https://travis-ci.org/lukaskroepfl/monitoring-nginx-proxy-companion) [![Go Report Card](https://goreportcard.com/badge/github.com/lukaskroepfl/monitoring-nginx-proxy-companion)](https://goreportcard.com/report/github.com/lukaskroepfl/monitoring-nginx-proxy-companion) [![Docker Pulls](https://img.shields.io/docker/pulls/lukaskroepfl/monitoring-nginx-proxy-companion.svg)]()
+
+monitoring-nginx-proxy-companion is a lightweight companion container for the [nginx-proxy](https://github.com/jwilder/nginx-proxy).
