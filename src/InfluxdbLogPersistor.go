@@ -2,20 +2,31 @@ package main
 
 import (
   "github.com/influxdata/influxdb/client/v2"
+  "strconv"
   "log"
   "time"
-  "strconv"
 )
 
-func WriteToInflux(parsedLogLine ParsedLogLine) {
+const INFLUX_URL_ENV_NAME = "INFLUX_URL"
+const INFLUX_URL_DEFAULT = "http://localhost:8086"
+
+type InfluxdbLogPersistor struct {
+  influxClient client.Client
+}
+
+func(influxdbLogPersistor *InfluxdbLogPersistor) Setup() {
   dbClient, err := client.NewHTTPClient(client.HTTPConfig{
     Addr: getInfluxUrl(),
   })
 
   if err != nil {
-    log.Fatal(err)
+    log.Fatal("Could not setup influx client, reason: ", err)
   }
 
+  influxdbLogPersistor.influxClient = dbClient
+}
+
+func (influxLogPersistor InfluxdbLogPersistor) Persist(parsedLogLine ParsedLogLine) {
   batchPoints, err := client.NewBatchPoints(client.BatchPointsConfig{
     Database:  "monitoring",
   })
@@ -46,7 +57,7 @@ func WriteToInflux(parsedLogLine ParsedLogLine) {
 
   batchPoints.AddPoint(point)
 
-  if err := dbClient.Write(batchPoints); err != nil {
+  if err := influxLogPersistor.influxClient.Write(batchPoints); err != nil {
     log.Println("Could not insert into influx .")
     return
   }
