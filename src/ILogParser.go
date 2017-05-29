@@ -15,6 +15,7 @@ type ParsedLogLine struct {
   browser        string
   browserVersion string
   os             string
+  mobile         bool
   country        string
   city           string
   latency        int
