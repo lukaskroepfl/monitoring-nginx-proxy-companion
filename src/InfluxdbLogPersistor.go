@@ -11,7 +11,7 @@ type InfluxdbLogPersistor struct {
   influxClient client.Client
 }
 
-func(influxdbLogPersistor *InfluxdbLogPersistor) Setup() {
+func (influxdbLogPersistor *InfluxdbLogPersistor) Setup() {
   dbClient, err := client.NewHTTPClient(client.HTTPConfig{
     Addr: getInfluxUrl(),
   })
@@ -31,20 +31,27 @@ func (influxLogPersistor InfluxdbLogPersistor) Persist(parsedLogLine ParsedLogLi
     log.Fatal(err)
   }
 
-  tags := map[string]string {
+  tags := map[string]string{
     "container_name": parsedLogLine.containerName,
     "host": parsedLogLine.host,
     "request_method": parsedLogLine.requestMethod,
     "http_version": parsedLogLine.httpVersion,
     "http_status": strconv.Itoa(parsedLogLine.httpStatus),
+    "browser": parsedLogLine.browser,
+    "browser_version": parsedLogLine.browserVersion,
+    "os": parsedLogLine.os,
+    "mobile": strconv.FormatBool(parsedLogLine.mobile),
+    "country": parsedLogLine.country,
+    "city": parsedLogLine.city,
   }
 
-  fields := map[string]interface{} {
+  fields := map[string]interface{}{
     "source_ip": parsedLogLine.sourceIp,
     "request_path": parsedLogLine.requestPath,
     "body_bytes_sent": parsedLogLine.bodyBytesSent,
     "http_referer": parsedLogLine.httpReferer,
     "user_agent": parsedLogLine.userAgent,
+    "latency": parsedLogLine.latency,
   }
 
   point, err := client.NewPoint("http_status", tags, fields, time.Now())
