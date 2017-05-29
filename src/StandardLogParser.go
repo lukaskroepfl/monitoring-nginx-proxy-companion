@@ -6,26 +6,15 @@ import (
   "errors"
 )
 
-type ParsedLogLine struct {
-  containerName string
-  host          string
-  sourceIp      string
-  timestamp     string
-  requestMethod string
-  requestPath   string
-  httpVersion   string
-  httpStatus    int
-  bodyBytesSent int
-  httpReferer   string
-  userAgent     string
+type StandardLogParser struct {
 }
 
 const LOG_LINE_REGEX = `^(\S+) *\|\s+(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
 
-func ParseProxyLogLine(line string) (ParsedLogLine, error) {
+func (standardLogParser StandardLogParser) Parse(logLine string) (ParsedLogLine, error) {
   var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
 
-  logLineParserRegexResult := logLineParserRegex.FindStringSubmatch(line)
+  logLineParserRegexResult := logLineParserRegex.FindStringSubmatch(logLine)
 
   containerName := logLineParserRegexResult[1]
 
