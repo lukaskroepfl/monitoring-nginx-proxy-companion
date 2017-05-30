@@ -1,7 +1,6 @@
 package main
 
 type ParsedLogLine struct {
-  containerName  string
   host           string
   sourceIp       string
   timestamp      string

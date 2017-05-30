@@ -31,8 +31,7 @@ func (influxLogPersistor InfluxdbLogPersistor) Persist(parsedLogLine ParsedLogLi
     log.Fatal(err)
   }
 
-  tags := map[string]string{
-    "container_name": parsedLogLine.containerName,
+  tags := map[string]string {
     "host": parsedLogLine.host,
     "request_method": parsedLogLine.requestMethod,
     "http_version": parsedLogLine.httpVersion,
