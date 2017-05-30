@@ -16,7 +16,7 @@ func (geoIp2IPLookupService GeoIp2IPLookupService) Lookup(ip string) IPLocation 
   }
   defer db.Close()
 
-  parsedIp := net.ParseIP("81.2.69.142")
+  parsedIp := net.ParseIP(ip)
 
   record, err := db.City(parsedIp)
   if err != nil {
