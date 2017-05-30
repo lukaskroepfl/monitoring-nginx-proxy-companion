@@ -15,6 +15,9 @@ func (standardLogParser StandardLogParser) Parse(logLine string) (ParsedLogLine,
   var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
 
   logLineParserRegexResult := logLineParserRegex.FindStringSubmatch(logLine)
+  if len(logLineParserRegexResult) <= 0 {
+    return ParsedLogLine{}, errors.New("Log line did not match nginx log line.")
+  }
 
   containerName := logLineParserRegexResult[1]
 

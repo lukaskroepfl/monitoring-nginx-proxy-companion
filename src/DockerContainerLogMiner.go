@@ -30,9 +30,7 @@ func (dockerContainerLogMiner *DockerContainerLogMiner) ParseAndPersistStdPipesO
     for {
       line, _ := buf.ReadString('\n')
 
-
       parsedLogLine, err := (*dockerContainerLogMiner.logParser).Parse(line)
-
       if err != nil {
         continue
       }
