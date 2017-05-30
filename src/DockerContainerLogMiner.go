@@ -10,6 +10,8 @@ import (
 
 const DOCKER_DAEMON_SOCKET = "unix:///var/run/docker.sock"
 
+const LOG_LINE_DELIMITER = "\n"
+
 type DockerContainerLogMiner struct {
   logPersistor *ILogPersistor
   logParser *ILogParser
@@ -28,7 +30,7 @@ func (dockerContainerLogMiner *DockerContainerLogMiner) ParseAndPersistStdPipesO
     buf := bufio.NewReader(input)
 
     for {
-      line, _ := buf.ReadString('\n')
+      line, _ := buf.ReadString(LOG_LINE_DELIMITER)
 
       parsedLogLine, err := (*dockerContainerLogMiner.logParser).Parse(line)
       if err != nil {
@@ -37,7 +39,7 @@ func (dockerContainerLogMiner *DockerContainerLogMiner) ParseAndPersistStdPipesO
         (*dockerContainerLogMiner.logPersistor).Persist(parsedLogLine)
       }
 
-      time.Sleep(1000 * time.Millisecond)
+      time.Sleep(100 * time.Millisecond)
     }
   }
 
