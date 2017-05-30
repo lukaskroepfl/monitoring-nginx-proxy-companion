@@ -2,7 +2,7 @@ package main
 
 type IPLocation struct {
   country string
-  city string
+  city    string
 }
 
 type IIPLookup interface {

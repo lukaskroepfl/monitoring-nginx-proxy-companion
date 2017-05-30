@@ -14,7 +14,7 @@ const LOG_LINE_DELIMITER = "\n"
 
 type DockerContainerLogMiner struct {
   logPersistor *ILogPersistor
-  logParser *ILogParser
+  logParser    *ILogParser
 }
 
 func (dockerContainerLogMiner *DockerContainerLogMiner) SetLogPersistor(logPersistor ILogPersistor) {
@@ -48,7 +48,6 @@ func (dockerContainerLogMiner *DockerContainerLogMiner) ParseAndPersistStdPipesO
   go listenToPipe(stdout)
   go listenToPipe(stderr)
 }
-
 
 func (dockerContainerLogMiner *DockerContainerLogMiner) Mine() {
   containerId := findProxyContainerId()
