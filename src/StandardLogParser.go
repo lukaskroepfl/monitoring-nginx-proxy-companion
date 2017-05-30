@@ -9,7 +9,7 @@ import (
 type StandardLogParser struct {
 }
 
-const LOG_LINE_REGEX = `^(\S+) *\|\s+(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
+const LOG_LINE_REGEX = `\s*(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
 
 func (standardLogParser StandardLogParser) Parse(logLine string) (ParsedLogLine, error) {
   var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
@@ -19,30 +19,31 @@ func (standardLogParser StandardLogParser) Parse(logLine string) (ParsedLogLine,
     return ParsedLogLine{}, errors.New("Log line did not match nginx log line.")
   }
 
-  containerName := logLineParserRegexResult[1]
+  regexFieldIndex := 1
+  host := logLineParserRegexResult[regexFieldIndex]
+  regexFieldIndex++
+  remoteAddress := logLineParserRegexResult[regexFieldIndex]
+  regexFieldIndex++
+  timestamp := logLineParserRegexResult[regexFieldIndex]
 
-  if !isProxyContainer(containerName) {
-    return ParsedLogLine{}, errors.New("Container name does not match proxy container name.")
-  }
-
-  host := logLineParserRegexResult[2]
-  remoteAddress := logLineParserRegexResult[3]
-  timestamp := logLineParserRegexResult[4]
-  httpRequest := logLineParserRegexResult[5]
-
+  regexFieldIndex++
+  httpRequest := logLineParserRegexResult[regexFieldIndex]
   var httpRequestRegex = regexp.MustCompile(`^(\S+)\s+(\S+)\s+(\S+)`)
   httpRequestRegexResult := httpRequestRegex.FindStringSubmatch(httpRequest)
   requestType := httpRequestRegexResult[1]
   requestPath := httpRequestRegexResult[2]
   httpVersion := httpRequestRegexResult[3]
 
-  httpStatus, _ := strconv.Atoi(logLineParserRegexResult[6])
-  bodyBytesSent, _ := strconv.Atoi(logLineParserRegexResult[7])
-  httpReferer := logLineParserRegexResult[8]
-  userAgent := logLineParserRegexResult[9]
+  regexFieldIndex++
+  httpStatus, _ := strconv.Atoi(logLineParserRegexResult[regexFieldIndex])
+  regexFieldIndex++
+  bodyBytesSent, _ := strconv.Atoi(logLineParserRegexResult[regexFieldIndex])
+  regexFieldIndex++
+  httpReferer := logLineParserRegexResult[regexFieldIndex]
+  regexFieldIndex++
+  userAgent := logLineParserRegexResult[regexFieldIndex]
 
   parsedLogLine := ParsedLogLine{}
-  parsedLogLine.containerName = containerName
   parsedLogLine.host = host
   parsedLogLine.sourceIp = remoteAddress
   parsedLogLine.timestamp = timestamp
@@ -77,8 +78,4 @@ func lookupIpAndSetFields(ip string, parsedLogLine *ParsedLogLine) {
 
   parsedLogLine.country = ipLocation.country
   parsedLogLine.city = ipLocation.city
-}
-
-func isProxyContainer(containerName string) bool {
-  return containerName == getProxyContainerName()
 }

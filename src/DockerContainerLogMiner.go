@@ -32,10 +32,12 @@ func (dockerContainerLogMiner *DockerContainerLogMiner) ParseAndPersistStdPipesO
 
       parsedLogLine, err := (*dockerContainerLogMiner.logParser).Parse(line)
       if err != nil {
-        continue
+        log.Printf("Error while parsing log line, reason: %s, log line: %s", err, line)
+      } else {
+        (*dockerContainerLogMiner.logPersistor).Persist(parsedLogLine)
       }
 
-      (*dockerContainerLogMiner.logPersistor).Persist(parsedLogLine)
+      time.Sleep(1000 * time.Millisecond)
     }
   }
 
@@ -82,6 +84,8 @@ func (dockerContainerLogMiner *DockerContainerLogMiner) Mine() {
     if dockerLogErr != nil {
       panic(dockerLogErr)
     }
+
+    time.Sleep(1000 * time.Millisecond)
   }
 }
 
@@ -96,7 +100,7 @@ func findProxyContainerId() string {
   proxyContainerName := getProxyContainerName()
 
   filters := make(map[string][]string)
-  filters["name"] = append(filters["name"], proxyContainerName)
+  filters["name"] = append(filters["name"], "/" + proxyContainerName)
 
   log.Println("Getting proxy container with name: ", proxyContainerName)
   containers, err := client.ListContainers(docker.ListContainersOptions{Filters: filters})
@@ -110,6 +114,8 @@ func findProxyContainerId() string {
 
   proxyContainer := containers[0]
   proxyContainerId := proxyContainer.ID
+
+  log.Printf("Selected container id: %s", proxyContainerId)
 
   return proxyContainerId
 }
