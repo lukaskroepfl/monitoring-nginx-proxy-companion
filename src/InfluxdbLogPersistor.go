@@ -25,7 +25,7 @@ func (influxdbLogPersistor *InfluxdbLogPersistor) Setup() {
 
 func (influxLogPersistor InfluxdbLogPersistor) Persist(parsedLogLine ParsedLogLine) {
   batchPoints, err := client.NewBatchPoints(client.BatchPointsConfig{
-    Database:  "monitoring",
+    Database: getInfluxDbName(),
   })
   if err != nil {
     log.Fatal(err)
@@ -69,4 +69,8 @@ func (influxLogPersistor InfluxdbLogPersistor) Persist(parsedLogLine ParsedLogLi
 
 func getInfluxUrl() string {
   return GetEnvOrPanic(INFLUX_URL_ENV_NAME)
+}
+
+func getInfluxDbName() string {
+  return GetEnvOrPanic(INFLUX_DB_ENV_NAME)
 }
