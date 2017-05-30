@@ -6,7 +6,7 @@ import (
 
 const PROXY_CONTAINER_NAME_ENV_NAME = "PROXY_CONTAINER_NAME"
 const INFLUX_URL_ENV_NAME = "INFLUX_URL"
-const INFLUX_DB_ENV_NAME = "INFLUX_DB_ENV_NAME"
+const INFLUX_DB_ENV_NAME = "INFLUX_DB_NAME"
 
 func main() {
   log.Println("Starting monitoring-nginx-proxy-companion")
