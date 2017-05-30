@@ -6,7 +6,7 @@ import (
 )
 
 func TestParsesContainerName(t *testing.T) {
-  line := `nginx                                | blog.kroepfl.io 193.80.91.32 - - [27/May/2017:19:26:27 +0000] "GET /wp-content/uploads/2017/04/Untitled.png HTTP/1.1" 404 18000 "https://blog.kroepfl.io/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"`
+  line := `blog.kroepfl.io 193.80.91.32 - - [27/May/2017:19:26:27 +0000] "GET /wp-content/uploads/2017/04/Untitled.png HTTP/1.1" 404 18000 "https://blog.kroepfl.io/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"`
 
   standardLogParser := StandardLogParser{}
 
@@ -16,7 +16,6 @@ func TestParsesContainerName(t *testing.T) {
     t.Fail()
   }
 
-  assert.Equal(t, "nginx", parsedLogLine.containerName)
   assert.Equal(t, "blog.kroepfl.io", parsedLogLine.host)
   assert.Equal(t, "193.80.91.32", parsedLogLine.sourceIp)
   assert.Equal(t, "27/May/2017:19:26:27 +0000", parsedLogLine.timestamp)
