@@ -21,5 +21,7 @@ type HttpRequest struct {
 }
 
 type ILogParser interface {
+  SetUserAgentParser(userAgentParser IUserAgentParser)
+  SetIpLookupService(ipLookupService IIpLookupService)
   Parse(logLine string) (HttpRequest, error)
 }
