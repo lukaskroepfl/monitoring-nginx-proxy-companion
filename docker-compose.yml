@@ -65,6 +65,18 @@ services:
     networks:
       - proxy-tier
 
+  monitoring-grafana:
+    image: grafana/grafana
+    restart: always
+    container_name: monitoring-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SERVER_ROOT_URL=http://localhost
+      - GF_SECURITY_ADMIN_PASSWORD=your_password
+    networks:
+      - proxy-tier
+
 networks:
   proxy-tier:
     external:
