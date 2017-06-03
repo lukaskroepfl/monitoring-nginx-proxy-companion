@@ -13,30 +13,22 @@ const DOCKER_DAEMON_SOCKET = "unix:///var/run/docker.sock"
 const LOG_LINE_DELIMITER = '\n'
 
 type DockerContainerLogMiner struct {
-  httpRequestPersistor *IHttpRequestPersistor
-  logParser            *ILogParser
+  httpRequestPersistor IHttpRequestPersistor
+  logParser            ILogParser
 }
 
-func (dockerContainerLogMiner *DockerContainerLogMiner) SetHttpRequestPersistor(httpRequestPersistor IHttpRequestPersistor) {
-  dockerContainerLogMiner.httpRequestPersistor = &httpRequestPersistor
-}
-
-func (dockerContainerLogMiner *DockerContainerLogMiner) SetLogParser(logParser ILogParser) {
-  dockerContainerLogMiner.logParser = &logParser
-}
-
-func (dockerContainerLogMiner *DockerContainerLogMiner) ParseAndPersistStdPipesOutput(stdout, stderr io.Reader) {
+func (dockerContainerLogMiner DockerContainerLogMiner) ParseAndPersistStdPipesOutput(stdout, stderr io.Reader) {
   listenToPipe := func(input io.Reader) {
     buf := bufio.NewReader(input)
 
     for {
       line, _ := buf.ReadString(LOG_LINE_DELIMITER)
 
-      httpRequest, err := (*dockerContainerLogMiner.logParser).Parse(line)
+      httpRequest, err := dockerContainerLogMiner.logParser.Parse(line)
       if err != nil {
         log.Printf("Error while parsing log line, reason: %s, log line: %s", err, line)
       } else {
-        (*dockerContainerLogMiner.httpRequestPersistor).Persist(httpRequest)
+        dockerContainerLogMiner.httpRequestPersistor.Persist(httpRequest)
       }
 
       time.Sleep(100 * time.Millisecond)
