@@ -9,15 +9,15 @@ const INFLUX_URL_ENV_NAME = "INFLUX_URL"
 const INFLUX_DB_ENV_NAME = "INFLUX_DB_NAME"
 
 func main() {
-  log.Println("Starting monitoring-nginx-proxy-companion")
+  log.Println("Starting monitoring-nginx-proxy-companion.")
 
   log.Println("Setting up influx client.")
-  influxdbLogPersistor := InfluxdbLogPersistor{}
-  influxdbLogPersistor.Setup()
+  influxdbHttpRequestPersistor := InfluxdbHttpRequestPersistor{}
+  influxdbHttpRequestPersistor.Setup()
 
   log.Println("Creating docker container log miner.")
   dockerContainerLogMiner := DockerContainerLogMiner{}
-  dockerContainerLogMiner.SetLogPersistor(influxdbLogPersistor)
+  dockerContainerLogMiner.SetHttpRequestPersistor(influxdbHttpRequestPersistor)
   logParser := StandardLogParser{}
   dockerContainerLogMiner.SetLogParser(logParser)
 

@@ -10,15 +10,15 @@ import (
 
 const DOCKER_DAEMON_SOCKET = "unix:///var/run/docker.sock"
 
-const LOG_LINE_DELIMITER = "\n"
+const LOG_LINE_DELIMITER = '\n'
 
 type DockerContainerLogMiner struct {
-  logPersistor *ILogPersistor
-  logParser    *ILogParser
+  httpRequestPersistor *IHttpRequestPersistor
+  logParser            *ILogParser
 }
 
-func (dockerContainerLogMiner *DockerContainerLogMiner) SetLogPersistor(logPersistor ILogPersistor) {
-  dockerContainerLogMiner.logPersistor = &logPersistor
+func (dockerContainerLogMiner *DockerContainerLogMiner) SetHttpRequestPersistor(httpRequestPersistor IHttpRequestPersistor) {
+  dockerContainerLogMiner.httpRequestPersistor = &httpRequestPersistor
 }
 
 func (dockerContainerLogMiner *DockerContainerLogMiner) SetLogParser(logParser ILogParser) {
@@ -32,18 +32,18 @@ func (dockerContainerLogMiner *DockerContainerLogMiner) ParseAndPersistStdPipesO
     for {
       line, _ := buf.ReadString(LOG_LINE_DELIMITER)
 
-      parsedLogLine, err := (*dockerContainerLogMiner.logParser).Parse(line)
+      httpRequest, err := (*dockerContainerLogMiner.logParser).Parse(line)
       if err != nil {
         log.Printf("Error while parsing log line, reason: %s, log line: %s", err, line)
       } else {
-        (*dockerContainerLogMiner.logPersistor).Persist(parsedLogLine)
+        (*dockerContainerLogMiner.httpRequestPersistor).Persist(httpRequest)
       }
 
       time.Sleep(100 * time.Millisecond)
     }
   }
 
-  log.Println("Listening to stdout and stderr pipes")
+  log.Println("Listening to stdout and stderr pipes.")
 
   go listenToPipe(stdout)
   go listenToPipe(stderr)
