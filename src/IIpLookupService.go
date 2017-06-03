@@ -5,6 +5,6 @@ type IPLocation struct {
   city    string
 }
 
-type IIPLookup interface {
-  Lookup(ip string)
+type IIpLookupService interface {
+  Lookup(ip string) IPLocation
 }
