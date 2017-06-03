@@ -7,19 +7,11 @@ import (
 )
 
 type StandardLogParser struct {
-  userAgentParser *IUserAgentParser
-  ipLookupService *IIpLookupService
+  userAgentParser IUserAgentParser
+  ipLookupService IIpLookupService
 }
 
 const LOG_LINE_REGEX = `\s*(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
-
-func (standardLogParser *StandardLogParser) SetUserAgentParser(userAgentParser IUserAgentParser) {
-  standardLogParser.userAgentParser = &userAgentParser
-}
-
-func (standardLogParser *StandardLogParser) SetIpLookupService(ipLookupService IIpLookupService) {
-  standardLogParser.ipLookupService = &ipLookupService
-}
 
 func (standardLogParser StandardLogParser) Parse(logLine string) (HttpRequest, error) {
   var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
@@ -65,15 +57,14 @@ func (standardLogParser StandardLogParser) Parse(logLine string) (HttpRequest, e
   parsedLogLine.httpReferer = httpReferer
   parsedLogLine.userAgent = userAgent
 
-  parseUserAgentAndSetFields(userAgent, &parsedLogLine)
-  lookupIpAndSetFields(remoteAddress, &parsedLogLine)
+  parseUserAgentAndSetFields(standardLogParser.userAgentParser, userAgent, &parsedLogLine)
+  lookupIpAndSetFields(standardLogParser.ipLookupService, remoteAddress, &parsedLogLine)
 
   return parsedLogLine, nil
 }
 
-func parseUserAgentAndSetFields(userAgentString string, parsedLogLine *HttpRequest) {
-  mssolaUserAgentParser := MssolaUserAgentParser{}
-  userAgent := mssolaUserAgentParser.Parse(userAgentString)
+func parseUserAgentAndSetFields(userAgentParser IUserAgentParser, userAgentString string, parsedLogLine *HttpRequest) {
+  userAgent := userAgentParser.Parse(userAgentString)
 
   parsedLogLine.browser = userAgent.browser
   parsedLogLine.browserVersion = userAgent.browserVersion
@@ -81,10 +72,8 @@ func parseUserAgentAndSetFields(userAgentString string, parsedLogLine *HttpReque
   parsedLogLine.mobile = userAgent.mobile
 }
 
-func lookupIpAndSetFields(ip string, parsedLogLine *HttpRequest) {
-  geoIp2IPLookupService := GeoIp2IpLookupService{}
-
-  ipLocation := geoIp2IPLookupService.Lookup(ip)
+func lookupIpAndSetFields(ipLookupService IIpLookupService, ip string, parsedLogLine *HttpRequest) {
+  ipLocation := ipLookupService.Lookup(ip)
 
   parsedLogLine.country = ipLocation.country
   parsedLogLine.city = ipLocation.city
