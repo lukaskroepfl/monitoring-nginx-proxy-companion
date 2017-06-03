@@ -11,15 +11,25 @@ const INFLUX_DB_ENV_NAME = "INFLUX_DB_NAME"
 func main() {
   log.Println("Starting monitoring-nginx-proxy-companion.")
 
-  log.Println("Setting up influx client.")
+  log.Println("Creating dependencies of log miner.")
+
+  log.Println("Creating influx client.")
   influxdbHttpRequestPersistor := InfluxdbHttpRequestPersistor{}
   influxdbHttpRequestPersistor.Setup()
 
+  log.Println("Creating log parser.")
+  mssolaUserAgentParser := MssolaUserAgentParser{}
+  geoIp2IpLookupService := GeoIp2IpLookupService{}
+  logParser := StandardLogParser{
+    userAgentParser: mssolaUserAgentParser,
+    ipLookupService: geoIp2IpLookupService,
+  }
+
   log.Println("Creating docker container log miner.")
-  dockerContainerLogMiner := DockerContainerLogMiner{}
-  dockerContainerLogMiner.SetHttpRequestPersistor(influxdbHttpRequestPersistor)
-  logParser := StandardLogParser{}
-  dockerContainerLogMiner.SetLogParser(logParser)
+  dockerContainerLogMiner := DockerContainerLogMiner{
+    logParser: logParser,
+    httpRequestPersistor: influxdbHttpRequestPersistor,
+  }
 
   log.Println("Start log mining.")
   dockerContainerLogMiner.Mine()
