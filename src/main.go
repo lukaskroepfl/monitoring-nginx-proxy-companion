@@ -17,7 +17,7 @@ func main() {
   influxdbHttpRequestPersistor := InfluxdbHttpRequestPersistor{}
   influxdbHttpRequestPersistor.Setup()
 
-  log.Println("Creating log parser.")
+  log.Println("Creating user agent parser, ip lookup service and log parser.")
   mssolaUserAgentParser := MssolaUserAgentParser{}
   geoIp2IpLookupService := GeoIp2IpLookupService{}
   logParser := StandardLogParser{
