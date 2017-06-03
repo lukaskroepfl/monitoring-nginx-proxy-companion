@@ -1,9 +1,11 @@
 package main
 
+import "time"
+
 type HttpRequest struct {
   host           string
   sourceIp       string
-  timestamp      string
+  timestamp      time.Time
   requestMethod  string
   requestPath    string
   httpVersion    string

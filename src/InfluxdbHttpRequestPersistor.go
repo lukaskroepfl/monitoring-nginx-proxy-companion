@@ -4,7 +4,6 @@ import (
   "github.com/influxdata/influxdb/client/v2"
   "strconv"
   "log"
-  "time"
   "fmt"
 )
 
@@ -61,7 +60,7 @@ func (influxLogPersistor InfluxdbHttpRequestPersistor) Persist(httpRequest HttpR
     "latency": httpRequest.latency,
   }
 
-  point, err := client.NewPoint(SERIES_NAME, tags, fields, time.Now())
+  point, err := client.NewPoint(SERIES_NAME, tags, fields, httpRequest.timestamp)
   if err != nil {
     log.Fatal(err)
   }
