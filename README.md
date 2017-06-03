@@ -4,6 +4,8 @@ monitoring-nginx-proxy-companion is a lightweight companion container for the [n
 
 ## Usage with docker-compose
 
+### 1) docker-compose.yml
+
 If you are already using docker-compose for your nginx-proxy setup you need to add two services shown below to it.
 Be sure to have the correct user-defined network set and adapt `PROXY_CONTAINER_NAME` to your proxy's container
 name. (the full `docker-compose.yml` can be found in the root of this repository)
@@ -48,3 +50,21 @@ monitoring-nginx-proxy-companion:
 ```
 
 The `monitoring-nginx-proxy-companion` creates a influxdb database on startup with the name set by `INFLUX_DB_NAME` if necessary.
+
+### 2) Start Services
+
+```
+docker-compose up -d
+```
+
+### 3) Add Grafana Datasource
+
+![add-datasource](https://raw.githubusercontent.com/lukaskroepfl/monitoring-nginx-proxy-companion/master/add-influx-datasource.png)
+
+### 4) Add Nginx Proxy Monitoring Dashboard
+
+You can simply import the dashboard I created by importing following json.
+
+`https://raw.githubusercontent.com/lukaskroepfl/monitoring-nginx-proxy-companion/master/grafana-dashboard.json`
+
+![add-datasource](https://raw.githubusercontent.com/lukaskroepfl/monitoring-nginx-proxy-companion/master/dashboard.png)
