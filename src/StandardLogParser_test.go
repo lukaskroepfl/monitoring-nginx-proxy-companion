@@ -36,4 +36,6 @@ func TestParsesSomeLogLines(t *testing.T) {
   assert.Equal(t, "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36", httpRequest.userAgent)
   assert.Equal(t, "Chrome", httpRequest.browser)
   assert.Equal(t, "58.0.3029.110", httpRequest.browserVersion)
+  assert.Equal(t, "Linux x86_64", httpRequest.os)
+  assert.Equal(t, false, httpRequest.mobile)
 }
