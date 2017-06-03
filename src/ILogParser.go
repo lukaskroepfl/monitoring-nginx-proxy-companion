@@ -1,6 +1,6 @@
 package main
 
-type ParsedLogLine struct {
+type HttpRequest struct {
   host           string
   sourceIp       string
   timestamp      string
@@ -21,5 +21,5 @@ type ParsedLogLine struct {
 }
 
 type ILogParser interface {
-  Parse(logLine string) (ParsedLogLine, error)
+  Parse(logLine string) (HttpRequest, error)
 }

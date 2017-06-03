@@ -11,12 +11,12 @@ type StandardLogParser struct {
 
 const LOG_LINE_REGEX = `\s*(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
 
-func (standardLogParser StandardLogParser) Parse(logLine string) (ParsedLogLine, error) {
+func (standardLogParser StandardLogParser) Parse(logLine string) (HttpRequest, error) {
   var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
 
   logLineParserRegexResult := logLineParserRegex.FindStringSubmatch(logLine)
   if len(logLineParserRegexResult) <= 0 {
-    return ParsedLogLine{}, errors.New("Log line did not match nginx log line.")
+    return HttpRequest{}, errors.New("Log line did not match nginx log line.")
   }
 
   regexFieldIndex := 1
@@ -43,7 +43,7 @@ func (standardLogParser StandardLogParser) Parse(logLine string) (ParsedLogLine,
   regexFieldIndex++
   userAgent := logLineParserRegexResult[regexFieldIndex]
 
-  parsedLogLine := ParsedLogLine{}
+  parsedLogLine := HttpRequest{}
   parsedLogLine.host = host
   parsedLogLine.sourceIp = remoteAddress
   parsedLogLine.timestamp = timestamp
@@ -61,7 +61,7 @@ func (standardLogParser StandardLogParser) Parse(logLine string) (ParsedLogLine,
   return parsedLogLine, nil
 }
 
-func parseUserAgentAndSetFields(userAgentString string, parsedLogLine *ParsedLogLine) {
+func parseUserAgentAndSetFields(userAgentString string, parsedLogLine *HttpRequest) {
   mssolaUserAgentParser := MssolaUserAgentParser{}
   userAgent := mssolaUserAgentParser.Parse(userAgentString)
 
@@ -71,7 +71,7 @@ func parseUserAgentAndSetFields(userAgentString string, parsedLogLine *ParsedLog
   parsedLogLine.mobile = userAgent.mobile
 }
 
-func lookupIpAndSetFields(ip string, parsedLogLine *ParsedLogLine) {
+func lookupIpAndSetFields(ip string, parsedLogLine *HttpRequest) {
   geoIp2IPLookupService := GeoIp2IPLookupService{}
 
   ipLocation := geoIp2IPLookupService.Lookup(ip)
