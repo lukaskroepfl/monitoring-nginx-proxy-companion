@@ -7,9 +7,19 @@ import (
 )
 
 type StandardLogParser struct {
+  userAgentParser *IUserAgentParser
+  ipLookupService *IIpLookupService
 }
 
 const LOG_LINE_REGEX = `\s*(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
+
+func (standardLogParser *StandardLogParser) SetUserAgentParser(userAgentParser IUserAgentParser) {
+  standardLogParser.userAgentParser = &userAgentParser
+}
+
+func (standardLogParser *StandardLogParser) SetIpLookupService(ipLookupService IIpLookupService) {
+  standardLogParser.ipLookupService = &ipLookupService
+}
 
 func (standardLogParser StandardLogParser) Parse(logLine string) (HttpRequest, error) {
   var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
@@ -72,7 +82,7 @@ func parseUserAgentAndSetFields(userAgentString string, parsedLogLine *HttpReque
 }
 
 func lookupIpAndSetFields(ip string, parsedLogLine *HttpRequest) {
-  geoIp2IPLookupService := GeoIp2IPLookupService{}
+  geoIp2IPLookupService := GeoIp2IpLookupService{}
 
   ipLocation := geoIp2IPLookupService.Lookup(ip)
 
