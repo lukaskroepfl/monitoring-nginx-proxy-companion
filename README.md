@@ -33,6 +33,18 @@ monitoring-nginx-proxy-companion:
       - "~/monitoring-influx-db/data:/var/lib/influxdb"
     networks:
       - proxy-tier
+      
+    monitoring-grafana:
+      image: grafana/grafana
+      restart: always
+      container_name: monitoring-grafana
+      ports:
+        - "3000:3000"
+      environment:
+        - GF_SERVER_ROOT_URL=http://your_host
+        - GF_SECURITY_ADMIN_PASSWORD=your_password
+      networks:
+        - proxy-tier
 ```
 
 The `monitoring-nginx-proxy-companion` creates a influxdb database on startup with the name set by `INFLUX_DB_NAME` if necessary.
