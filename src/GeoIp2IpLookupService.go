@@ -6,8 +6,7 @@ import (
   "net"
 )
 
-type GeoIp2IpLookupService struct {
-}
+type GeoIp2IpLookupService struct {}
 
 func (geoIp2IPLookupService GeoIp2IpLookupService) Lookup(ip string) IPLocation {
   db, err := geoip2.Open("GeoLite2-City.mmdb")
