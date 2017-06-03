@@ -5,7 +5,7 @@ monitoring-nginx-proxy-companion is a lightweight companion container for the [n
 ## Usage with docker-compose
 
 If you are already using docker-compose for your nginx-proxy setup you need to add two services shown below to it.
-Be sure to have the correct user-defined network set and adapt `PROXY_CONTAINER_NAME` to the your proxy's container
+Be sure to have the correct user-defined network set and adapt `PROXY_CONTAINER_NAME` to your proxy's container
 name. (the full `docker-compose.yml` can be found in the root of this repository)
 
 ```yml
@@ -35,4 +35,4 @@ monitoring-nginx-proxy-companion:
       - proxy-tier
 ```
 
-The `monitoring-nginx-proxy-companion` creates a influxdb database if necessary.
+The `monitoring-nginx-proxy-companion` creates a influxdb database on startup with the name set by `INFLUX_DB_NAME` if necessary.
