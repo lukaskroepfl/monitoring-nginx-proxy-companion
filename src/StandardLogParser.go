@@ -15,6 +15,8 @@ type StandardLogParser struct {
 
 const LOG_LINE_REGEX = `\s*(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
 
+const STANDARD_LOG_LINE_DATE_FORMAT = "02/Jan/2006:15:04:05 +0000"
+
 func (standardLogParser StandardLogParser) Parse(logLine string) (HttpRequest, error) {
   var logLineParserRegex = regexp.MustCompile(LOG_LINE_REGEX)
 
@@ -82,8 +84,7 @@ func lookupIpAndSetFields(ipLookupService IIpLookupService, ip string, httpReque
 }
 
 func convertDateStringToTime(dateString string) time.Time {
-  layout := "02/Jan/2006:15:04:05 +0000"
-  t, err := time.Parse(layout, dateString)
+  t, err := time.Parse(STANDARD_LOG_LINE_DATE_FORMAT, dateString)
 
   if err != nil {
     log.Fatal("Could not parse date string, reason: ", err)
