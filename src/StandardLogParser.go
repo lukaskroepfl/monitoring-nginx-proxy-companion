@@ -13,7 +13,7 @@ type StandardLogParser struct {
   ipLookupService IIpLookupService
 }
 
-const LOG_LINE_REGEX = `\s*(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"`
+const LOG_LINE_REGEX = `\s*(\S+)\s+(\S+).+\[(.+)\]\s+"([^"]+)"\s+(\S+)\s+(\S+)\s+"([^"]+)"\s+"([^"]+)"($|\s+(\S+))`
 
 const STANDARD_LOG_LINE_DATE_FORMAT = "02/Jan/2006:15:04:05 +0000"
 
@@ -49,6 +49,18 @@ func (standardLogParser StandardLogParser) Parse(logLine string) (HttpRequest, e
   regexFieldIndex++
   userAgent := logLineParserRegexResult[regexFieldIndex]
 
+  regexFieldIndex += 2;
+  latency := logLineParserRegexResult[regexFieldIndex]
+
+  var latencyFloat float64
+  if latency != "" {
+    var err error
+    latencyFloat, err = strconv.ParseFloat(latency, 64)
+    if err != nil {
+      log.Fatal("Could not parse float, reason: ", err)
+    }
+  }
+
   httpRequest := HttpRequest{}
   httpRequest.host = host
   httpRequest.sourceIp = remoteAddress
@@ -60,6 +72,7 @@ func (standardLogParser StandardLogParser) Parse(logLine string) (HttpRequest, e
   httpRequest.bodyBytesSent = bodyBytesSent
   httpRequest.httpReferer = httpReferer
   httpRequest.userAgent = userAgent
+  httpRequest.latency = latencyFloat
 
   parseUserAgentAndSetFields(standardLogParser.userAgentParser, userAgent, &httpRequest)
   lookupIpAndSetFields(standardLogParser.ipLookupService, remoteAddress, &httpRequest)
